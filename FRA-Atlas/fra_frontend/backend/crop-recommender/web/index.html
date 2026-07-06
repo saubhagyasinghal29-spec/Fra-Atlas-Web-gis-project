@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Crop recommender — map prototype</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+  :root{
+    --ink:#1c2a21; --paper:#f6f4ec; --line:#d9d4c4;
+    --safe:#1d9e75; --semi:#ba7517; --crit:#d85a30; --over:#a32d2d;
+    --panel:#fffdf7;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:"Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--paper)}
+  #wrap{display:flex;height:100%}
+  #map{flex:1;height:100%}
+  #side{width:340px;max-width:42vw;border-left:1px solid var(--line);background:var(--panel);
+        padding:20px;overflow-y:auto}
+  h1{font-size:18px;font-weight:600;margin:0 0 2px}
+  .sub{font-size:12px;color:#6b6658;margin:0 0 16px;line-height:1.5}
+  .hint{font-size:13px;color:#6b6658}
+  .water{font-size:12px;color:#6b6658;margin:2px 0 14px}
+  .crop{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:#fff}
+  .crop .row{display:flex;align-items:center;justify-content:space-between}
+  .crop .name{font-weight:600;font-size:14px}
+  .crop .score{font-weight:600;font-size:15px}
+  .bar{height:5px;border-radius:3px;background:#ece8db;margin:7px 0;overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:3px}
+  .reasons{font-size:12px;color:#54503f;line-height:1.6}
+  .reasons .ok{color:var(--safe)} .reasons .no{color:var(--over)}
+  .legend{font-size:12px;line-height:1.9;margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .note{font-size:11px;color:#8a8472;margin-top:14px;line-height:1.5}
+  code{background:#efece0;padding:1px 5px;border-radius:4px;font-size:11px}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="map"></div>
+  <div id="side">
+    <h1>Crop recommender</h1>
+    <p class="sub">Prototype map. Markers are coloured by groundwater sustainability; click one
+      to see its water budget and ranked crops. Geometry here is point-based for the demo — a
+      production build swaps in real district polygons (DataMeet / GADM) for a true choropleth.</p>
+    <div id="detail"><p class="hint">Select a district on the map.</p></div>
+    <div class="legend">
+      <div><span class="dot" style="background:var(--safe)"></span>safe groundwater</div>
+      <div><span class="dot" style="background:var(--semi)"></span>semi-critical</div>
+      <div><span class="dot" style="background:var(--crit)"></span>critical</div>
+      <div><span class="dot" style="background:var(--over)"></span>over-exploited</div>
+    </div>
+    <p class="note">Tries to fetch from <code>POST /recommend/batch</code> at
+      <code id="apiurl"></code>. If the API is not running it falls back to bundled sample
+      results so the map still works offline.</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+document.getElementById("apiurl").textContent = API_BASE + "/recommend/batch";
+
+// Demo districts (approximate centroids; replace with real boundaries in prod).
+const DISTRICTS = [
+  {district:"Hisar (Haryana)",     lat:29.15, lng:75.72, rainfall_mm:450, groundwater:"critical",       irrigation_pct:55, soil:"sandy loam", season:"rabi",   temperature_c:22},
+  {district:"Ludhiana (Punjab)",   lat:30.90, lng:75.85, rainfall_mm:700, groundwater:"over-exploited", irrigation_pct:98, soil:"loam",       season:"kharif", temperature_c:31},
+  {district:"Barmer (Rajasthan)",  lat:25.75, lng:71.40, rainfall_mm:270, groundwater:"semi-critical",  irrigation_pct:20, soil:"sandy",      season:"kharif", temperature_c:33},
+  {district:"Bardhaman (W.B.)",    lat:23.25, lng:87.85, rainfall_mm:1400,groundwater:"safe",           irrigation_pct:70, soil:"clay loam",  season:"kharif", temperature_c:29},
+  {district:"Tumkur (Karnataka)",  lat:13.34, lng:77.10, rainfall_mm:600, groundwater:"critical",       irrigation_pct:35, soil:"loam",       season:"kharif", temperature_c:26},
+];
+const GW_COLOR = {"safe":"#1d9e75","semi-critical":"#ba7517","critical":"#d85a30","over-exploited":"#a32d2d"};
+const scoreColor = s => s>=80?"#1d9e75":(s>=45?"#ba7517":"#888780");
+
+const map = L.map("map").setView([22.8, 80.0], 5);
+L.tileLayer("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",{}); // no-op guard
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+  attribution:"&copy; OpenStreetMap", maxZoom:10
+}).addTo(map);
+
+function renderDetail(d, result){
+  const el = document.getElementById("detail");
+  if(!result){ el.innerHTML = `<p class="hint">No data for ${d.district}.</p>`; return; }
+  const head = `<h1 style="font-size:16px">${result.district}</h1>
+    <p class="water">${Math.round(result.available_water_mm)} mm available
+      (${Math.round(result.effective_rain_mm)} rain + ${Math.round(result.irrigation_mm)} irrigation)
+      · ML: ${result.used_ml ? "on" : "off"}</p>`;
+  const cards = result.recommendations.slice(0,4).map(r=>{
+    const col = scoreColor(r.final_score);
+    const reasons = r.reasons.slice(0,3).map(x=>
+      `<span class="${x.ok?'ok':'no'}">${x.ok?'✓':'✕'}</span> ${x.text}`).join("<br>");
+    return `<div class="crop">
+      <div class="row"><span class="name">${r.crop}</span>
+        <span class="score" style="color:${col}">${Math.round(r.final_score)}</span></div>
+      <div class="bar"><i style="width:${Math.round(r.final_score)}%;background:${col}"></i></div>
+      <div class="reasons">${reasons}</div></div>`;
+  }).join("");
+  el.innerHTML = head + cards;
+}
+
+function addMarkers(byDistrict){
+  DISTRICTS.forEach(d=>{
+    const result = byDistrict[d.district];
+    const m = L.circleMarker([d.lat, d.lng], {
+      radius:11, color:"#fff", weight:2,
+      fillColor:GW_COLOR[d.groundwater]||"#888", fillOpacity:0.9
+    }).addTo(map);
+    m.bindTooltip(d.district, {direction:"top"});
+    m.on("click", ()=>renderDetail(d, result));
+  });
+}
+
+// Offline fallback: compute nothing client-side, just show that wiring works.
+function fallback(){
+  const out = {};
+  DISTRICTS.forEach(d=>{ out[d.district] = {
+    district:d.district, available_water_mm:0, effective_rain_mm:0, irrigation_mm:0, used_ml:false,
+    recommendations:[{crop:"(start the API to see live recommendations)", final_score:0,
+      rule_score:0, ml_score:null, season:d.season, water_target_mm:0,
+      reasons:[{ok:false, text:`run: uvicorn croprec.api:app --app-dir src`}]}]
+  };});
+  return out;
+}
+
+fetch(API_BASE + "/recommend/batch", {
+  method:"POST", headers:{"Content-Type":"application/json"},
+  body: JSON.stringify(DISTRICTS)
+}).then(r=>r.ok ? r.json() : Promise.reject(r.status))
+  .then(addMarkers)
+  .catch(()=>addMarkers(fallback()));
+</script>
+</body>
+</html>

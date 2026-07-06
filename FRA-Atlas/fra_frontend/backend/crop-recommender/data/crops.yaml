@@ -1,0 +1,162 @@
+# Pan-India crop knowledge base.
+#
+# This file is DATA, not logic. It is the agronomic backbone of the system and
+# is meant to be extended/curated by domain experts. Numbers are representative
+# ranges drawn from FAO-56 (crop water requirement / Kc method), ICAR package-of-
+# practices, and state agricultural university bulletins. They are starting
+# values for a decision-support tool, NOT precise per-field figures.
+#
+# Fields per crop:
+#   season     : rabi | kharif | zaid | annual   (annual = effectively always in season)
+#   water_mm   : [min, max] seasonal crop water requirement in millimetres
+#   intensity  : low | medium | high             (drives the groundwater sustainability penalty)
+#   temp_c     : [min, max] suitable mean growing-season temperature in Celsius
+#   soils      : list of compatible soil types (subset of soil_types below)
+#   zones      : informal agro-climatic hint (documentation only, not scored in v1)
+
+soil_types: [sandy, sandy loam, loam, clay loam, clay]
+
+crops:
+  - name: Rice
+    season: kharif
+    water_mm: [1200, 1800]
+    intensity: high
+    temp_c: [20, 37]
+    soils: [clay, clay loam]
+    zones: [eastern plains, coastal, irrigated north-west]
+
+  - name: Wheat
+    season: rabi
+    water_mm: [450, 650]
+    intensity: medium
+    temp_c: [10, 25]
+    soils: [loam, clay loam, sandy loam]
+    zones: [indo-gangetic plains, central]
+
+  - name: Maize
+    season: kharif
+    water_mm: [500, 800]
+    intensity: medium
+    temp_c: [18, 32]
+    soils: [loam, sandy loam, clay loam]
+    zones: [peninsular, hills, plains]
+
+  - name: Pearl millet (Bajra)
+    season: kharif
+    water_mm: [350, 500]
+    intensity: low
+    temp_c: [25, 35]
+    soils: [sandy, sandy loam, loam]
+    zones: [arid north-west, dry peninsular]
+
+  - name: Sorghum (Jowar)
+    season: kharif
+    water_mm: [450, 650]
+    intensity: low
+    temp_c: [24, 35]
+    soils: [loam, sandy loam, clay loam]
+    zones: [dry peninsular, central]
+
+  - name: Finger millet (Ragi)
+    season: kharif
+    water_mm: [400, 600]
+    intensity: low
+    temp_c: [20, 32]
+    soils: [loam, sandy loam, clay loam]
+    zones: [southern uplands]
+
+  - name: Mustard
+    season: rabi
+    water_mm: [250, 400]
+    intensity: low
+    temp_c: [10, 25]
+    soils: [sandy loam, loam, sandy]
+    zones: [north-west, central]
+
+  - name: Chickpea (Gram)
+    season: rabi
+    water_mm: [300, 400]
+    intensity: low
+    temp_c: [15, 28]
+    soils: [sandy loam, loam]
+    zones: [central, peninsular, north-west]
+
+  - name: Barley
+    season: rabi
+    water_mm: [350, 500]
+    intensity: low
+    temp_c: [12, 25]
+    soils: [sandy loam, loam]
+    zones: [north-west plains, hills]
+
+  - name: Lentil (Masoor)
+    season: rabi
+    water_mm: [300, 420]
+    intensity: low
+    temp_c: [15, 28]
+    soils: [loam, clay loam]
+    zones: [indo-gangetic plains, central]
+
+  - name: Cotton
+    season: kharif
+    water_mm: [700, 1300]
+    intensity: high
+    temp_c: [21, 35]
+    soils: [clay loam, loam]
+    zones: [central black-soil, north-west irrigated, southern]
+
+  - name: Sugarcane
+    season: annual
+    water_mm: [1500, 2500]
+    intensity: high
+    temp_c: [20, 38]
+    soils: [loam, clay loam]
+    zones: [sub-tropical north, tropical peninsular]
+
+  - name: Groundnut
+    season: kharif
+    water_mm: [500, 700]
+    intensity: medium
+    temp_c: [22, 33]
+    soils: [sandy loam, sandy, loam]
+    zones: [peninsular, western]
+
+  - name: Soybean
+    season: kharif
+    water_mm: [450, 700]
+    intensity: medium
+    temp_c: [20, 32]
+    soils: [loam, clay loam]
+    zones: [central plateau]
+
+  - name: Pigeon pea (Arhar)
+    season: kharif
+    water_mm: [600, 1000]
+    intensity: medium
+    temp_c: [20, 35]
+    soils: [loam, sandy loam, clay loam]
+    zones: [central, peninsular]
+
+  - name: Jute
+    season: kharif
+    water_mm: [1200, 1500]
+    intensity: high
+    temp_c: [24, 37]
+    soils: [loam, clay loam]
+    zones: [eastern humid plains]
+
+  - name: Potato
+    season: rabi
+    water_mm: [500, 700]
+    intensity: medium
+    temp_c: [15, 25]
+    soils: [sandy loam, loam]
+    zones: [indo-gangetic plains, hills]
+
+  - name: Sunflower
+    season: rabi
+    water_mm: [400, 600]
+    intensity: medium
+    temp_c: [18, 30]
+    soils: [loam, sandy loam]
+    zones: [peninsular, central]

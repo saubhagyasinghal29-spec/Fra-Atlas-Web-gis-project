@@ -1,0 +1,45 @@
+.dss-page { padding:28px 20px; }
+.dss-inner { max-width:1280px; margin:0 auto; display:flex; flex-direction:column; gap:22px; }
+.page-title { font-family:'Noto Serif',serif; font-size:22px; font-weight:700; padding-bottom:10px; border-bottom:2px solid var(--saffron); display:inline-block; }
+.dss-subtitle { font-size:13.5px; color:var(--gray-500); margin-top:8px; }
+.dss-header-row { margin-bottom:4px; }
+.dss-grid { display:grid; grid-template-columns:320px 1fr; gap:22px; align-items:start; }
+.dss-left { display:flex; flex-direction:column; gap:18px; }
+.dss-right { display:flex; flex-direction:column; gap:18px; }
+
+.form-group { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+.form-label { font-size:11.5px; font-weight:700; color:var(--gray-700); text-transform:uppercase; letter-spacing:.4px; }
+.form-control { border:1px solid var(--gray-300); border-radius:5px; padding:8px 10px; font-size:13.5px; transition:border-color .2s; }
+.form-control:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 3px rgba(0,48,135,.1); }
+
+.profile-top { text-align:center; margin-bottom:14px; }
+.profile-name { font-size:17px; font-weight:700; }
+.profile-state { font-size:12.5px; color:var(--gray-500); margin-top:2px; }
+.profile-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.profile-stat { background:var(--gray-100); border-radius:6px; padding:9px; text-align:center; }
+.ps-label { font-size:11px; color:var(--gray-500); }
+.ps-val { font-size:15px; font-weight:700; margin-top:2px; }
+
+.empty-state { text-align:center; padding:40px 20px; color:var(--gray-500); font-size:13.5px; line-height:1.6; }
+.schemes-list { display:flex; flex-direction:column; gap:12px; }
+.scheme-card { display:flex; gap:12px; padding:13px; border:1px solid var(--gray-200); border-radius:var(--radius); transition:border-color .15s; }
+.scheme-card:hover { border-color:var(--navy); }
+.scheme-icon { font-size:22px; width:40px; height:40px; background:var(--gray-100); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.scheme-title-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px; }
+.scheme-name { font-weight:700; font-size:14px; }
+.scheme-badge { font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; }
+.scheme-badge.eligible { background:var(--risk-excellent-bg); color:var(--risk-excellent); }
+.scheme-desc { font-size:12.5px; color:var(--gray-500); line-height:1.5; }
+.scheme-tags { display:flex; gap:6px; margin-top:6px; }
+.scheme-tag { font-size:10.5px; background:var(--navy); color:#fff; padding:2px 8px; border-radius:10px; }
+.scheme-tag.ministry { background:var(--gray-700); }
+
+.action-item { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid var(--gray-100); }
+.action-item:last-child { border-bottom:none; }
+
+.ministry-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.ministry-card { background:var(--gray-100); border-radius:var(--radius); padding:14px; text-align:center; }
+.dajgua-note { margin-top:14px; padding:12px; background:rgba(0,48,135,.05); border-radius:var(--radius); border-left:3px solid var(--navy); font-size:12.5px; color:var(--gray-700); line-height:1.6; }
+
+@media (max-width:900px) { .dss-grid { grid-template-columns:1fr; } .ministry-grid { grid-template-columns:1fr 1fr; } }
+@media (max-width:500px) { .ministry-grid { grid-template-columns:1fr; } }

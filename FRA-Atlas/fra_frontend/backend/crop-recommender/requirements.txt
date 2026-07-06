@@ -1,0 +1,15 @@
+# Core (rule engine + knowledge base)
+PyYAML>=6.0
+
+# API service
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+
+# Optional ML layer (train.py)
+scikit-learn>=1.4
+joblib>=1.3
+# xgboost>=2.0        # optional: swap in for RandomForest if you prefer
+
+# Tests (optional; tests also run standalone via `python tests/test_engine.py`)
+pytest>=8.0

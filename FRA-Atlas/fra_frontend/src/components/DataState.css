@@ -1,0 +1,16 @@
+.data-loading {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 64px 20px; color: var(--gray-500,#6b6f8a); font-size: 14px;
+}
+.data-spinner {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 3px solid var(--gray-200,#e6e3da); border-top-color: var(--saffron,#FF6200);
+  animation: data-spin 0.8s linear infinite;
+}
+@keyframes data-spin { to { transform: rotate(360deg); } }
+.data-banner {
+  margin: 0 0 16px; background: var(--risk-moderate-bg,#fdf0e3);
+  border: 1px solid rgba(230,126,34,0.3); color: #9a5a16;
+  border-radius: 8px; padding: 10px 14px; font-size: 12.5px;
+}
+@media (prefers-reduced-motion: reduce) { .data-spinner { animation: none; } }

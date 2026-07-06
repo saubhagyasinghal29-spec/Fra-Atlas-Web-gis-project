@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fra-web
+  labels: { app: fra-web }
+spec:
+  replicas: 5
+  selector: { matchLabels: { app: fra-web } }
+  template:
+    metadata:
+      labels: { app: fra-web }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8000"
+    spec:
+      containers:
+        - name: web
+          image: fra-atlas:latest
+          command: ["gunicorn", "config.wsgi:application", "--workers=4", "--bind=0.0.0.0:8000", "--timeout=60"]
+          ports: [{ containerPort: 8000 }]
+          envFrom:
+            - configMapRef: { name: fra-config }
+            - secretRef: { name: fra-secret }
+          resources:
+            requests: { memory: "256Mi", cpu: "250m" }
+            limits: { memory: "512Mi", cpu: "500m" }
+          readinessProbe:
+            httpGet: { path: /health/, port: 8000 }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet: { path: /health/, port: 8000 }
+            initialDelaySeconds: 20
+            periodSeconds: 30

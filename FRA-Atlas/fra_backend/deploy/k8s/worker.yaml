@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: fra-worker, labels: { app: fra-worker } }
+spec:
+  replicas: 3
+  selector: { matchLabels: { app: fra-worker } }
+  template:
+    metadata: { labels: { app: fra-worker } }
+    spec:
+      containers:
+        - name: worker
+          image: fra-atlas:latest
+          command: ["celery", "-A", "config", "worker", "-l", "info", "--concurrency=4"]
+          envFrom:
+            - configMapRef: { name: fra-config }
+            - secretRef: { name: fra-secret }
+          resources:
+            requests: { memory: "512Mi", cpu: "500m" }
+            limits: { memory: "1Gi", cpu: "1000m" }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: fra-beat, labels: { app: fra-beat } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: fra-beat } }
+  template:
+    metadata: { labels: { app: fra-beat } }
+    spec:
+      containers:
+        - name: beat
+          image: fra-atlas:latest
+          command: ["celery", "-A", "config", "beat", "-l", "info"]
+          envFrom:
+            - configMapRef: { name: fra-config }
+            - secretRef: { name: fra-secret }

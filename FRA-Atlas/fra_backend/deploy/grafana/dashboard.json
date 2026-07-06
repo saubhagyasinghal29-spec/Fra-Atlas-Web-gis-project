@@ -1,0 +1,15 @@
+{
+  "title": "FRA Atlas Backend",
+  "uid": "fra-atlas",
+  "schemaVersion": 39,
+  "panels": [
+    {"id": 1, "title": "API request rate", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+     "targets": [{"expr": "sum(rate(django_http_requests_total_by_view_transport_method_total[5m]))"}]},
+    {"id": 2, "title": "API P95 latency (s)", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+     "targets": [{"expr": "histogram_quantile(0.95, sum(rate(django_http_requests_latency_seconds_by_view_method_bucket[5m])) by (le))"}]},
+    {"id": 3, "title": "5xx error rate", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+     "targets": [{"expr": "sum(rate(django_http_responses_total_by_status{status=~\"5..\"}[5m]))"}]},
+    {"id": 4, "title": "DB query latency", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+     "targets": [{"expr": "histogram_quantile(0.95, sum(rate(django_db_query_duration_seconds_bucket[5m])) by (le))"}]}
+  ]
+}

@@ -1,0 +1,81 @@
+.crop-page { padding: 28px 20px; }
+.crop-inner { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+.page-title { font-family: 'Noto Serif', serif; font-size: 22px; font-weight: 700; padding-bottom: 10px; border-bottom: 2px solid var(--saffron); display: inline-block; }
+.crop-subtitle { font-size: 13.5px; color: var(--gray-500); margin-top: 8px; max-width: 680px; line-height: 1.6; }
+.crop-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+
+/* API status pill */
+.api-status { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; padding: 6px 12px; border-radius: 20px; flex-shrink: 0; }
+.api-status .status-dot { width: 9px; height: 9px; border-radius: 50%; }
+.api-status.checking { background: var(--gray-100); color: var(--gray-500); }
+.api-status.checking .status-dot { background: var(--gray-500); }
+.api-status.live { background: #E7F3E9; color: #1D7A3C; }
+.api-status.live .status-dot { background: #1D9E75; box-shadow: 0 0 0 3px rgba(29,158,117,0.2); }
+.api-status.offline { background: #FDEDE6; color: #BA5517; }
+.api-status.offline .status-dot { background: #BA7517; }
+
+/* Grid */
+.crop-grid { display: grid; grid-template-columns: 360px 1fr; gap: 18px; align-items: start; }
+.crop-left { display: flex; flex-direction: column; gap: 18px; }
+
+/* Form */
+.crop-form { display: flex; flex-direction: column; gap: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 11.5px; font-weight: 700; color: var(--gray-700); text-transform: uppercase; letter-spacing: .4px; }
+.form-control { border: 1px solid var(--gray-300); border-radius: 5px; padding: 8px 10px; font-size: 13.5px; transition: border-color .2s; }
+.form-control:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(0,48,135,.1); }
+.form-range { width: 100%; accent-color: var(--gov-green); cursor: pointer; }
+.crop-submit { background: var(--gov-green); color: #fff; border: none; padding: 11px; border-radius: var(--radius); font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s; margin-top: 4px; }
+.crop-submit:hover:not(:disabled) { background: #0f6d06; }
+.crop-submit:disabled { opacity: 0.6; cursor: wait; }
+.crop-error { background: #FDECEA; color: #C0392B; font-size: 12.5px; padding: 8px 12px; border-radius: 6px; border-left: 3px solid #C0392B; }
+
+/* Map */
+.crop-map-wrap { position: relative; height: 280px; }
+.crop-map { width: 100%; height: 100%; }
+.crop-legend { position: absolute; bottom: 12px; left: 12px; background: #fff; border: 1px solid var(--gray-300); border-radius: var(--radius); padding: 10px 12px; z-index: 500; box-shadow: var(--shadow-md); }
+.legend-title { font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--gray-500); letter-spacing: .5px; margin-bottom: 6px; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--gray-700); margin-bottom: 4px; }
+.legend-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+
+/* Results */
+.crop-empty { text-align: center; padding: 48px 20px; color: var(--gray-500); font-size: 13.5px; line-height: 1.6; }
+.fallback-tag { font-size: 10.5px; background: #FDEDE6; color: #BA5517; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
+
+/* Water budget */
+.water-budget { background: linear-gradient(135deg, #E7F1FB, #F0F6FC); border: 1px solid #C5DBF0; border-radius: var(--radius); padding: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.wb-item { text-align: center; }
+.wb-val { font-family: 'Noto Serif', serif; font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; }
+.wb-label { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
+.wb-split { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--gray-700); }
+.ml-tag { font-size: 10.5px; background: var(--gov-green); color: #fff; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+
+/* Crop cards */
+.crop-list { display: flex; flex-direction: column; gap: 10px; }
+.crop-card { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 12px 14px; transition: border-color .15s; }
+.crop-card:hover { border-color: var(--gov-green); }
+.crop-card-head { display: flex; align-items: center; gap: 10px; }
+.crop-rank { width: 22px; height: 22px; background: var(--gray-100); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; color: var(--gray-700); flex-shrink: 0; }
+.crop-name { font-weight: 700; font-size: 14.5px; flex: 1; }
+.crop-season-tag { font-size: 10.5px; background: var(--gray-100); color: var(--gray-700); padding: 2px 8px; border-radius: 10px; text-transform: capitalize; }
+.crop-score { font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.crop-bar { height: 6px; background: var(--gray-100); border-radius: 10px; overflow: hidden; margin: 8px 0 6px; }
+.crop-bar > div { height: 100%; border-radius: 10px; transition: width .5s; }
+.crop-meta { font-size: 11.5px; color: var(--gray-500); margin-bottom: 6px; }
+.crop-reasons { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 3px; }
+.crop-reasons li { font-size: 12px; line-height: 1.5; }
+.crop-reasons li.ok { color: #1D7A3C; }
+.crop-reasons li.no { color: #C0392B; }
+
+/* API note */
+.crop-api-note { background: var(--gray-100); border-radius: var(--radius); padding: 12px 16px; font-size: 12.5px; color: var(--gray-700); line-height: 1.6; border-left: 3px solid var(--navy); }
+.crop-api-note code { background: #fff; padding: 1px 6px; border-radius: 4px; font-size: 11.5px; border: 1px solid var(--gray-300); }
+
+@media (max-width: 1000px) {
+  .crop-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .form-row { grid-template-columns: 1fr; }
+  .crop-header-row { flex-direction: column; }
+}

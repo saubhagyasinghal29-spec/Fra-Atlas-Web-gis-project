@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata: { name: fra-web }
+spec:
+  selector: { app: fra-web }
+  ports: [{ port: 80, targetPort: 8000 }]
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fra-ingress
+  annotations: { nginx.ingress.kubernetes.io/ssl-redirect: "true" }
+spec:
+  tls: [{ hosts: ["api.fra-atlas.gov.in"], secretName: fra-tls }]
+  rules:
+    - host: api.fra-atlas.gov.in
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: fra-web, port: { number: 80 } } }

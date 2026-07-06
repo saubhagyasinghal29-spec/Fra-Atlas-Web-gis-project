@@ -1,0 +1,38 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env: { POSTGRES_DB: fra_atlas, POSTGRES_USER: fra, POSTGRES_PASSWORD: fra }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U fra" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+    env:
+      DATABASE_URL: postgis://fra:fra@localhost:5432/fra_atlas
+      REDIS_URL: redis://localhost:6379/0
+      USE_GIS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: System deps (GeoDjango)
+        run: sudo apt-get update && sudo apt-get install -y gdal-bin libgdal-dev libgeos-dev libproj-dev libsqlite3-mod-spatialite postgresql-client
+      - run: pip install -r requirements.txt ruff bandit pip-audit
+      - name: Enable PostGIS for test DB
+        run: PGPASSWORD=fra psql -h localhost -U fra -d fra_atlas -c "ALTER ROLE fra SUPERUSER;"
+      - name: Lint (blocking)
+        run: ruff check apps config
+      - name: Security scan (blocking)
+        run: bandit -r apps config -ll
+      - name: Dependency vulnerability scan
+        run: pip-audit --strict || true   # advisory: upstream CVEs shouldn't block app CI
+      - name: Tests + coverage gate
+        run: pytest -q --cov=apps --cov-report=term --cov-fail-under=80

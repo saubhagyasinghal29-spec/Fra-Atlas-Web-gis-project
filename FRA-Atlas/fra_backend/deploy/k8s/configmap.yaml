@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fra-config
+data:
+  DJANGO_DEBUG: "0"
+  CELERY_BROKER_URL: "redis://redis:6379/0"
+  USE_GIS: "1"
+  ENCRYPTION_ACTIVE_VERSION: "1"

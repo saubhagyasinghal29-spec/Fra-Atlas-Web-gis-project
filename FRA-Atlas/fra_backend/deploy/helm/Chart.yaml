@@ -1,0 +1,6 @@
+apiVersion: v2
+name: fra-atlas
+description: Forest Rights Act Atlas Decision Support backend
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;700&display=swap');
+@import 'leaflet/dist/leaflet.css';
+
+:root {
+  --saffron: #FF6200;
+  --navy: #003087;
+  --gov-green: #138808;
+  --gold: #C8922A;
+  --ivory: #F7F4ED;
+  --white: #FFFFFF;
+
+  --risk-critical: #C0392B;
+  --risk-moderate: #E67E22;
+  --risk-good: #82B543;
+  --risk-excellent: #1A7A3C;
+  --risk-critical-bg: #FDECEA;
+  --risk-moderate-bg: #FEF5E7;
+  --risk-good-bg: #EEF5E6;
+  --risk-excellent-bg: #E8F5EE;
+
+  --gray-900: #1A1A2E;
+  --gray-700: #333652;
+  --gray-500: #6B6F8A;
+  --gray-300: #C8CDD8;
+  --gray-100: #F0F2F6;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.14);
+  --radius: 8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans', Arial, sans-serif;
+  background: var(--ivory);
+  color: var(--gray-900);
+  font-size: 15px;
+  line-height: 1.6;
+}
+a { color: var(--navy); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: inherit; cursor: pointer; }
+input, select { font-family: inherit; }
+
+/* Leaflet marker cluster overrides */
+.marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+  background-clip: padding-box;
+  border-radius: 50%;
+}
+.marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
+  width: 30px; height: 30px;
+  margin-left: 5px; margin-top: 5px;
+  text-align: center; border-radius: 15px;
+  font-weight: 700; font-size: 12px;
+  color: white; display: flex;
+  align-items: center; justify-content: center;
+}
+.fra-cluster { background: transparent !important; border: none !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--gray-100); }
+::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
