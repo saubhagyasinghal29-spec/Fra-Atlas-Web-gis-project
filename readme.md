@@ -8,7 +8,27 @@
 **Live demo:** [View the dashboard](#getting-started) | **Status:** Production-ready
 
 ---
+## 👥 Project Team & Credits
 
+**Vansetu** is a collaborative group project developed by:
+
+**Core Development Team:**
+- [Saubhagya Singhal] https://github.com/saubhagyasinghal29-spec
+- [Rohail Hussain]    https://github.com/TeraCodeRoker
+- [Sahil Bhardwaj]    https://github.com/sahilbhardwaj81
+- [Sashwat Nain]      https://github.com/sassy121298
+- [Sarthak Saini]     https://github.com/nyc-Sarthak
+- [Sajan] 
+
+**Advisors & Support:**
+- Ministry of Tribal Affairs (MoTA), Government of India
+- [Partner University / Organization / Institution Name]
+
+---
+
+## 🤝 Contributing
+
+[Contribution guidelines...]
 ## 🎯 Why Vansetu?
 
 The Forest Rights Act demands systematic claim processing across 500+ districts. Vansetu cuts through complexity:
