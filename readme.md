@@ -18,7 +18,7 @@
 - [Sahil Bhardwaj]    https://github.com/sahilbhardwaj81
 - [Sashwat Nain]      https://github.com/sassy121298
 - [Sarthak Saini]     https://github.com/nyc-Sarthak
-- [Sajan] 
+- [Sajan]             https://github.com/sajanrathore53-max
 
 ## 🎯 Why Vansetu?
 
