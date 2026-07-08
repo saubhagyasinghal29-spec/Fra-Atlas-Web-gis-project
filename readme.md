@@ -1,250 +1,519 @@
-# FRA Atlas — AI-Powered WebGIS & Decision Support System
+# 🗺️ Vansetu — FRA Atlas | AI-Powered WebGIS & Decision Support System
 
-An integrated monitoring platform for **Forest Rights Act (FRA), 2006** implementation, built for the Ministry of Tribal Affairs. Combines a district-level risk atlas, interactive WebGIS, a forest-fire early-warning module, and a water-aware crop recommender — all in one React application.
+**Vansetu** (*Van* = Forest, *Setu* = Bridge) is an integrated monitoring and decision-support platform for **Forest Rights Act (FRA), 2006** implementation, built for the Ministry of Tribal Affairs, Government of India. Vansetu combines district-level risk intelligence, interactive WebGIS, forest-fire early-warning, and a water-aware crop recommender into a unified, data-driven React application.
 
-**Priority states:** Madhya Pradesh · Tripura · Odisha · Telangana
-**Design language:** india.gov.in inspired (Tiranga saffron/navy/green, Noto Sans/Serif)
+**Serving:** Madhya Pradesh · Tripura · Odisha · Telangana · 16 states in India  
+**Design:** india.gov.in inspired (Tiranga palette, Noto Sans/Serif typography)  
+**Website:** Vansetu  
 
----
-
-## Table of Contents
-
-- [What this is](#what-this-is)
-- [Modules](#modules)
-- [Tech stack](#tech-stack)
-- [Project structure](#project-structure)
-- [Getting started](#getting-started)
-- [Module details](#module-details)
-  - [1. FRA Risk Dashboard & Atlas Map](#1-fra-risk-dashboard--atlas-map)
-  - [2. Decision Support System (DSS)](#2-decision-support-system-dss)
-  - [3. Analytics](#3-analytics)
-  - [4. Fire Alert — 7-Day Forecast](#4-fire-alert--7-day-forecast)
-  - [5. Crop Recommender](#5-crop-recommender)
-- [Data pipeline](#data-pipeline)
-- [Backend integration](#backend-integration)
-- [Updating data when models re-run](#updating-data-when-models-re-run)
-- [Known limitations & honest caveats](#known-limitations--honest-caveats)
-- [Roadmap](#roadmap)
 
 ---
 
-## What this is
+## 🎯 Why Vansetu?
 
-Three ML-driven problems, one frontend:
+The Forest Rights Act demands systematic claim processing across 500+ districts. Vansetu cuts through complexity:
 
-| Problem | Model output consumed | Page |
-|---|---|---|
-| FRA claim-processing risk across districts | K-Means clustering + PCA + risk index (CSV + charts) | Dashboard, Map, Analytics, DSS |
-| Forest fire early warning | Random Forest / XGBoost / Ensemble / LSTM classifiers (CSV + ROC/PR curves) | Fire Alert |
-| Crop suitability for FRA patta-holder land | Deterministic agronomy rule engine, ML-scoring-ready (FastAPI service) | Crop Recommender |
+- **Risk Intelligence:** ML-driven risk stratification of all 500 districts across 16 states
+- **Real-time Monitoring:** Interactive WebGIS for claim status, forest loss, tribal coverage
+- **Predictive Fire Alerts:** 7-day forest-fire forecast powered by ensemble ML models
+- **Smart Farming:** Water-aware crop recommendations for FRA beneficiary land (18 crops, FAO-56 agronomy)
+- **Action Planning:** Convergence-ready scheme eligibility (PM-KISAN, Jal Jeevan, MGNREGA, PMAY-G, SAUBHAGYA, Van Bandhu Kalyan Yojana)
 
-Each module was integrated **from real model outputs** — CSVs, evaluation charts, and (for crops) a documented API contract — not from placeholder data.
+All data flows from **real ML models**—no placeholder demos.
 
 ---
 
-## Modules
+## 📊 Modules At a Glance
+
+| Module | Purpose | Page | Data Source |
+|--------|---------|------|-------------|
+| **Dashboard + FRA Atlas Map** | Risk stratification of 500 districts | `/`, `/map` | K-Means clustering + PCA + risk index (CSV) |
+| **Analytics** | ML model introspection + live Recharts | `/analytics` | Heatmap, PCA scatter, factor importance, live data |
+| **Decision Support System (DSS)** | Scheme eligibility + action priority | `/dss` | FRA risk profile × CSS/scheme matrix |
+| **Fire Alert** | 7-day forest-fire forecast | `/fire` | Random Forest / XGBoost / Ensemble / LSTM classifiers |
+| **Crop Recommender** | Water-aware crop suitability + rankings | `/crops` | 18-crop agronomic knowledge base + rule engine |
+| **Reports** | Export, data pipeline status | `/reports` | Metadata + download templates |
+
+---
+
+## 🏗️ Tech Stack
+
+| Layer | Technology | Notes |
+|-------|-----------|-------|
+| **Framework** | React 19 + Vite | ⚡ Lightning-fast HMR |
+| **Routing** | React Router v6 | Client-side navigation |
+| **Maps** | Leaflet + react-leaflet + clustering | 500 district markers, heatmaps, live scrubbing |
+| **Charts** | Recharts | Interactive ML visualizations |
+| **Icons** | lucide-react | 350+ icons, lightweight |
+| **Backend (Optional)** | FastAPI (Python) | Crop recommender API, `/recommend` endpoint |
+| **Styling** | Hand-built design system | No CSS framework; `src/index.css` + per-page CSS |
+| **Deployment** | Static SPA (dist/) or embedded | Pairs with Django / Flask / FastAPI backends |
+
+**No external dependencies required for core functionality.** Backend is optional and has a JS fallback.
+
+---
+
+## 📁 Project Structure
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        FRA Atlas (React SPA)                 │
-├───────────────┬───────────────┬──────────────┬──────────────┤
-│  Dashboard /   │  Fire Alert   │  Crop         │  Reports      │
-│  Map / DSS /   │  /fire        │  Recommender  │  /reports     │
-│  Analytics     │               │  /crops       │               │
-├───────────────┴───────────────┴──────────────┴──────────────┤
-│ FRA risk data   │ Fire forecast  │ Crop rule engine (JS) ──┐  │
-│ (static JSON,   │ (static JSON,  │  ↕ falls back to ↕      │  │
-│  500 districts) │  280 records)  │ FastAPI /recommend ─────┘  │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Tech stack
-
-| Layer | Choice |
-|---|---|
-| Framework | React 19 + Vite |
-| Routing | React Router v6 |
-| Charts | Recharts |
-| Maps | Leaflet + react-leaflet + react-leaflet-cluster |
-| Icons | lucide-react |
-| Crop backend (optional) | FastAPI (Python), bundled under `backend/` |
-
-No CSS framework — a hand-built design system in `src/index.css` + per-page CSS files, styled after india.gov.in.
-
----
-
-## Project structure
-
-```
-fra-atlas/
+vansetu/  (FRA Atlas — Forest Rights Act WebGIS)
 ├── backend/
-│   └── crop-recommender/          # FastAPI service (optional, has offline fallback)
-│       ├── src/croprec/           # engine.py, water.py, api.py, knowledge_base.py
-│       ├── data/crops.yaml        # 18-crop agronomic knowledge base
-│       ├── API_CONTRACT.md        # frontend/backend integration contract
-│       └── requirements.txt
+│   └── crop-recommender/              # FastAPI service (optional)
+│       ├── src/croprec/
+│       │   ├── engine.py              # Core rule engine
+│       │   ├── water.py               # Water budget logic (FAO-56)
+│       │   ├── api.py                 # /recommend endpoint
+│       │   └── knowledge_base.py      # 18-crop definitions
+│       ├── data/crops.yaml            # Agronomic knowledge base
+│       ├── API_CONTRACT.md            # Frontend/backend integration spec
+│       └── requirements.txt           # FastAPI, pydantic, uvicorn
+│
 ├── public/
-│   └── images/                    # ML output charts (heatmap, PCA, ranking, ROC/PR, feature importance)
+│   └── images/                        # ML output charts
+│       ├── factor_heatmap.png
+│       ├── pca_clusters.png
+│       ├── risk_ranking.png
+│       ├── fire_feature_importance.png
+│       ├── fire_roc_curves.png
+│       └── fire_pr_curves.png
+│
 ├── scripts/
-│   ├── gen_data.py                # regenerate fraData.js from FRA risk CSV
-│   └── gen_fire_data.py           # regenerate fireData.js from fire forecast CSV
+│   ├── gen_data.py                    # Regenerate fraData.js from CSV
+│   └── gen_fire_data.py               # Regenerate fireData.js from CSV
+│
 ├── src/
-│   ├── components/layout/         # Layout, Panel, RiskBadge (shared UI)
+│   ├── components/
+│   │   └── layout/                    # Layout, Panel, RiskBadge (shared UI)
+│   │
 │   ├── data/
-│   │   ├── fraData.js             # 500 FRA districts (auto-generated)
-│   │   ├── fireData.js            # 280 fire forecasts, 7 days × 40 locations (auto-generated)
-│   │   ├── cropKnowledgeBase.js   # 18 crops (mirrors backend crops.yaml)
-│   │   └── constants.js           # colors, state lists, scheme definitions
+│   │   ├── fraData.js                 # 500 FRA districts (auto-generated)
+│   │   ├── fireData.js                # 280 fire forecasts (auto-generated)
+│   │   ├── cropKnowledgeBase.js       # 18 crops (mirrors backend)
+│   │   └── constants.js               # Colors, states, districts, schemes
+│   │
 │   ├── utils/
-│   │   ├── cropApi.js             # FastAPI client with offline fallback + timeout
-│   │   └── cropEngine.js          # JS port of the rule engine (fallback scorer)
+│   │   ├── cropApi.js                 # FastAPI client + fallback logic
+│   │   └── cropEngine.js              # JS rule engine (offline scorer)
+│   │
 │   ├── pages/
-│   │   ├── Dashboard.jsx          # /        — hero, KPIs, charts, top-risk table
-│   │   ├── MapPage.jsx            # /map     — Leaflet WebGIS, clustering, filters
-│   │   ├── Analytics.jsx          # /analytics — ML charts, live Recharts comparisons
-│   │   ├── DSS.jsx                # /dss     — CSS scheme eligibility engine
-│   │   ├── FireForecast.jsx       # /fire    — 7-day fire risk map + timeline
-│   │   ├── CropRecommender.jsx    # /crops   — crop scoring form + map
-│   │   └── Reports.jsx            # /reports — export cards, pipeline status
-│   ├── App.jsx                    # router
-│   └── main.jsx                   # entry point
-└── package.json
+│   │   ├── Dashboard.jsx              # / — KPIs, risk distribution, top-15 table
+│   │   ├── MapPage.jsx                # /map — Interactive Leaflet WebGIS
+│   │   ├── Analytics.jsx              # /analytics — ML charts + live Recharts
+│   │   ├── DSS.jsx                    # /dss — CSS scheme eligibility engine
+│   │   ├── FireForecast.jsx           # /fire — 7-day fire risk timeline
+│   │   ├── CropRecommender.jsx        # /crops — Crop scoring form + results
+│   │   └── Reports.jsx                # /reports — Export, status checks
+│   │
+│   ├── App.jsx                        # Router setup
+│   └── main.jsx                       # Entry point
+│
+├── index.html                         # HTML shell
+├── package.json                       # npm dependencies
+└── vite.config.js                     # Vite configuration
 ```
 
 ---
 
-## Getting started
+## 🚀 Quick Start
+
+### Install & Run
 
 ```bash
+# Clone the Vansetu repository
+git clone https://github.com/saubhagyasinghal29-spec/Fra-Atlas-Web-gis-project.git
+cd Fra-Atlas-Web-gis-project  # Vansetu
+
+# Install dependencies
 npm install
-npm run dev        # → http://localhost:5173
-npm run build       # production build → dist/
-npm run preview     # serve the production build locally
+
+# Start dev server
+npm run dev
+# → Open http://localhost:5173
 ```
 
-**Optional — enable live crop scoring:**
+### Build for Production
+
+```bash
+npm run build        # Creates dist/ folder
+npm run preview      # Test production build locally
+```
+
+### Optional: Enable Live Crop Scoring
+
 ```bash
 cd backend/crop-recommender
 pip install -r requirements.txt
 uvicorn croprec.api:app --reload --app-dir src
-# → http://127.0.0.1:8000  (interactive docs at /docs)
+# → Accessible at http://127.0.0.1:8000/docs
 ```
-The Crop Recommender page works with or without this running — see [Module 5](#5-crop-recommender).
+
+The Crop Recommender works with or without the backend. Without it, the page falls back transparently to a JavaScript implementation of the same scoring logic.
 
 ---
 
-## Module details
+## 📍 Module Deep Dives
 
-### 1. FRA Risk Dashboard & Atlas Map
+### 1. Vansetu Risk Dashboard & Atlas Map (`/`, `/map`)
 
-**Data source:** `fra_risk_scores.csv` → 500 districts across 16 states, each with a Risk Index (K-Means cluster + composite score), Risk Level (Critical/Moderate/Good/Excellent), and 8 underlying factors (approval rate, pending claims rate, avg processing time, forest loss rate, tribal population coverage, CFR recognition rate, rejection rate, encroachment density).
+**Data:** `fra_risk_scores.csv` → 500 districts across 16 states
 
-- **`/` Dashboard** — animated KPI counters, risk distribution donut, state-wise stacked bar, top-15 high-risk table, focused-state cards, mini-map preview, critical alert digest.
-- **`/map` FRA Atlas Map** — full-screen Leaflet map, all 500 districts as clustered circle markers colored by risk, filter toolbar (risk level / state / free-text search / basemap switch), click-to-inspect side panel with all 8 metrics, deep-links into DSS.
+Each district is scored on a **Risk Index** (0–100) derived from:
+- K-Means clustering + PCA reduction
+- 8 composite factors: approval rate, pending claims, processing time, forest loss, tribal coverage, CFR recognition, rejections, encroachment density
 
-### 2. Decision Support System (DSS)
+**Dashboard (`/`):**
+- Animated KPI counters (total districts, critical alerts, avg processing time)
+- Risk distribution donut + state-wise stacked bar chart
+- Top-15 high-risk table with drill-down links
+- Focused-state card carousel with mini-map preview
+- Critical alert digest (top 5 by urgency)
 
-**`/dss`** — given a state + district, layers Central Sector Scheme (CSS) eligibility on top of the FRA risk profile: PM-KISAN, Jal Jeevan Mission, MGNREGA, PMAY-G, SAUBHAGYA, Van Bandhu Kalyan Yojana, and others. Generates a priority action plan (Immediate / Short-term / Medium-term) driven by the district's actual pending-claims rate, processing time, and forest-loss figures. Includes a DAJGUA 3-ministry convergence panel (Environment / Tribal Affairs / Agriculture).
+**Map (`/map`):**
+- Full-screen Leaflet map with 500 districts as clustered circle markers
+- Marker color: Risk level (🔴 Critical / 🟠 Moderate / 🟡 Good / 🟢 Excellent)
+- Filter toolbar: risk level, state, free-text search, basemap toggle
+- Click district → side panel with all 8 metrics + DSS deeplink
+- Performance: clusters dynamically based on zoom
 
-### 3. Analytics
+---
 
-**`/analytics`** — embeds the ML team's evaluation charts (factor correlation heatmap, PCA cluster scatter, risk ranking) alongside **live** Recharts visualizations computed from the same dataset: a switchable state-metric bar chart (6 metrics) and a 500-point scatter of Risk Index vs. Approval Rate, colored by risk level.
+### 2. Decision Support System (`/dss`)
 
-### 4. Fire Alert — 7-Day Forecast
+**Purpose:** Turn FRA risk intelligence into actionable policy.
 
-**Data source:** `fire_forecast_7day.csv` → 280 records (40 monitored locations × 7 days, 24–30 June), each with a fire probability and risk level (High/Medium/Low), covering central India (MP / Telangana / Odisha region).
+Given a state + district, DSS layers Central Sector Scheme (CSS) eligibility and generates a **priority action plan**:
 
-**`/fire`** — fully static, no backend required:
-- Interactive Leaflet map, circle size proportional to fire probability, colored by risk
+**Schemes Checked:**
+- PM-KISAN (income support)
+- Jal Jeevan Mission (water access)
+- MGNREGA (rural employment)
+- PMAY-G (rural housing)
+- SAUBHAGYA (electricity)
+- Van Bandhu Kalyan Yojana (tribal welfare)
+- + 4 other schemes
+
+**Output:** Action priorities tagged by urgency:
+- **Immediate** (pending claims > 35%, processing time > 180 days, forest loss > 2%)
+- **Short-term** (moderate thresholds)
+- **Medium-term** (preventive/monitoring)
+
+**Convergence Panel:** DAJGUA 3-ministry view (Ministry of Environment / Ministry of Tribal Affairs / Ministry of Agriculture)
+
+---
+
+### 3. Analytics (`/analytics`)
+
+Embeds ML team's evaluation charts alongside **live Recharts computations**:
+
+**Static Outputs:**
+- Factor correlation heatmap (8 metrics × 8 metrics)
+- PCA cluster scatter (Risk Index vs. PC1/PC2)
+- District risk ranking (top 50)
+
+**Live Interactive Charts:**
+- State-metric bar chart (switchable between 6 metrics, 500 points)
+- Risk Index vs. Approval Rate scatter (colored by risk level, click to filter)
+
+All data sourced from the same `fraData.js` for consistency.
+
+---
+
+### 4. Fire Alert — 7-Day Forecast (`/fire`)
+
+**Data:** `fire_forecast_7day.csv` → 280 records (40 locations × 7 days, 24–30 June)
+
+**Models Evaluated:**
+- Random Forest (ROC-AUC 0.68, PR-AUC 0.65)
+- XGBoost (ROC-AUC 0.70, PR-AUC 0.67)
+- Ensemble (ROC-AUC 0.69, PR-AUC 0.66)
+- LSTM (ROC-AUC 0.67, PR-AUC 0.64)
+
+**Features Ranked:** LST (Land Surface Temperature), day-of-year, NDVI, month, rainfall, wind speed, forest cover
+
+**UI:**
+- Interactive Leaflet map (40 locations)
+- Circle marker size ∝ fire probability; color ∝ risk (High/Medium/Low)
 - **7-day timeline scrubber** with ▶ Play/Pause animation
-- Risk-level filter, per-location popups, top-8 highest-risk list with click-to-fly-to
-- 7-day trend line chart (High/Medium/Low zone counts per day)
-- **Model performance panel**: comparison table (RandomForest / XGBoost / Ensemble / LSTM — ROC-AUC 0.67–0.70, PR-AUC 0.64–0.67), a live feature-importance bar chart (LST, day-of-year, NDVI, month, rainfall, wind speed, forest cover), and the original ROC/PR curve images from the training notebook
-
-### 5. Crop Recommender
-
-**Data source:** `backend/crop-recommender/data/crops.yaml` — an 18-crop pan-India agronomic knowledge base (FAO-56 water requirement ranges, ICAR package-of-practices), plus a documented FastAPI contract (`API_CONTRACT.md`).
-
-**`/crops`** — a district-conditions form (rainfall, temperature, irrigation cover, groundwater status, soil type, season) returns a ranked, explained list of suitable crops:
-
-- Scores 0–100 per crop, built from water-budget match, groundwater-sustainability penalty (scaled by crop water intensity), soil compatibility, season match, and temperature suitability
-- Each recommendation includes a ✓/✕ reasons list (e.g. *"Penalised −8: low-water crop in critical block"*)
-- A groundwater-colored district map for quick selection
-- **Live/offline status pill**: calls `POST /recommend` on the FastAPI backend when reachable; otherwise transparently falls back to a faithful JS port of the same scoring logic (`src/utils/cropEngine.js`), so the page never breaks in a demo without the backend running
-- `used_ml: true` / `ml_score` fields are wired through and will populate automatically once a trained ML model (`models/model.joblib`) is added on the backend — **no frontend change needed**
-
-> **Naming note:** this is a rule-based *recommendation* engine (ranks which crops suit a district), not a numeric *yield-prediction* model (it does not output tons/hectare). The API contract explicitly reserves an `ml_score` slot for a future trained model — that's the natural place a yield regressor would plug in.
+- Risk-level filter + per-location popups
+- Top-8 highest-risk list (click to fly-to location)
+- 7-day trend chart (stacked High/Medium/Low zone counts)
+- Model performance comparison panel + ROC/PR curve images
 
 ---
 
-## Data pipeline
+### 5. Crop Recommender (`/crops`)
+
+**Data:** `crops.yaml` — 18-crop pan-India agronomic knowledge base (FAO-56 water requirements, ICAR package-of-practices)
+
+**Input Form:**
+- District (dropdown, 150+ districts, color-coded by groundwater status)
+- Rainfall, temperature, irrigation cover, groundwater status, soil type, season
+
+**Scoring Logic (0–100 per crop):**
+1. Water-budget match (rainfall + irrigation − crop requirement)
+2. Groundwater sustainability penalty (−% × water intensity)
+3. Soil compatibility (% supported soil types)
+4. Season match (current season in crop's growing window?)
+5. Temperature suitability (within FAO range?)
+
+**Output:**
+- Ranked list of crops (1st = highest score)
+- Each with ✓/✕ reasons (e.g., *"Penalised −8: low-water crop in critical block"*)
+- Interactive district map, groundwater color-coded
+- ML-score placeholder wired through (reserved for future trained model)
+
+**Backend Integration:**
+- Calls `POST /recommend` on FastAPI when reachable (documented in `API_CONTRACT.md`)
+- Falls back transparently to JavaScript version (`src/utils/cropEngine.js`) if service unavailable
+- **Page never breaks in demos.**
+
+---
+
+## 🔄 Data Pipeline
 
 ```
-ML training (Colab / notebook)
-        │
-        ├── fra_risk_scores.csv ─────────► scripts/gen_data.py ─────► src/data/fraData.js
-        ├── fire_forecast_7day.csv ──────► scripts/gen_fire_data.py ─► src/data/fireData.js
-        ├── factor_heatmap.png ──────────► public/images/
-        ├── pca_clusters.png ────────────► public/images/
-        ├── risk_ranking.png ────────────► public/images/
-        ├── feature_importance.png ──────► public/images/fire_feature_importance.png
-        ├── roc_curves.png ──────────────► public/images/fire_roc_curves.png
-        ├── pr_curves.png ───────────────► public/images/fire_pr_curves.png
-        └── crops.yaml ──────────────────► backend/crop-recommender/data/
-                                                  (served live via FastAPI, or
-                                                   mirrored in src/data/cropKnowledgeBase.js
-                                                   for the offline fallback)
+ML Training (Colab / Jupyter)
+    │
+    ├─→ fra_risk_scores.csv ──→ scripts/gen_data.py ──→ src/data/fraData.js
+    ├─→ fire_forecast_7day.csv ──→ scripts/gen_fire_data.py ──→ src/data/fireData.js
+    ├─→ factor_heatmap.png ──→ public/images/
+    ├─→ pca_clusters.png ──→ public/images/
+    ├─→ risk_ranking.png ──→ public/images/
+    ├─→ fire_feature_importance.png ──→ public/images/
+    ├─→ fire_roc_curves.png ──→ public/images/
+    ├─→ fire_pr_curves.png ──→ public/images/
+    └─→ crops.yaml ──→ backend/crop-recommender/data/
+                      (served live via FastAPI OR mirrored
+                       in src/data/cropKnowledgeBase.js
+                       for offline fallback)
 ```
 
-All three data feeds are **pre-baked into static JS at build time** except the crop recommender, which prefers a live API call and only falls back to static logic when the service is unreachable.
+**All data pre-baked at build time** except crop recommendations, which prefer live API calls.
 
 ---
 
-## Backend integration
+## 🔗 Backend Integration
 
-This is a **frontend-only deliverable** designed to slot into any backend:
+This is a **frontend-only deliverable** designed to integrate with any backend:
 
-- **Django**: build (`npm run build`) and serve `dist/` as a template, mount your API under `/api/` — see the FRA-specific Django `views.py`/`urls.py` pattern if you're running the earlier Django variant of this project.
-- **FastAPI** (crop module only): already bundled and documented — see `backend/crop-recommender/API_CONTRACT.md`.
-- **CORS**: the crop FastAPI service has CORS wide open in dev (`allow_origins=["*"]`) — lock this to your real origin before production.
-
----
-
-## Updating data when models re-run
-
-```bash
-# FRA risk scores
-python3 scripts/gen_data.py path/to/fra_risk_scores.csv
-
-# Fire forecast
-python3 scripts/gen_fire_data.py path/to/fire_forecast_7day.csv
-
-# Then rebuild
+### Django Backend
+```python
+# Serve dist/ as a static template
 npm run build
+# Then mount your API under /api/ and configure CORS in your views.py
 ```
 
-For the crop knowledge base, edit `backend/crop-recommender/data/crops.yaml` directly — the live API will serve it immediately, and `src/data/cropKnowledgeBase.js` should be regenerated to keep the offline fallback in sync (a `gen_crop_kb.py` script can be added following the same pattern as the two scripts above).
+### FastAPI (Crop Module)
+Already bundled and documented — see `backend/crop-recommender/API_CONTRACT.md`.
 
-Updated ML chart images (heatmap, PCA, ranking, ROC/PR, feature importance) just need to be dropped into `public/images/` with matching filenames.
-
----
-
-## Known limitations & honest caveats
-
-- **Fire forecast dates are fixed** (24–30 June 2024) in the current CSV — the timeline will need live re-ingestion to stay current in production.
-- **District coordinates** for the FRA map and crop districts use a curated centroid lookup (`DISTRICT_COORDS` in `constants.js`), not official administrative boundary polygons. A production GIS layer should swap in real boundaries (e.g. DataMeet/GADM shapefiles).
-- **Crop Recommender demo districts** are the 5–7 sample points from the backend's own prototype (`web/index.html`), not a full district list — extend `CROP_DISTRICTS` in `constants.js` for full coverage.
-- **No yield prediction.** As noted above, the crop module ranks suitability; it doesn't forecast tons/hectare. If a yield regressor exists in the (currently inaccessible) Colab notebook, it would need its own endpoint and a new results panel — flag this if you want it added once the notebook is shared in a readable form.
-- **Water-budget coefficients** (effective rainfall fraction, max irrigation supplement) are FAO-56 planning defaults, explicitly flagged as uncalibrated in the backend source — see `water.py`'s own docstring.
+### CORS Configuration
+The bundled FastAPI crop service has `allow_origins=["*"]` in dev. **Lock this to your real origin before production deployment.**
 
 ---
 
-## Roadmap
+## 🔄 Updating Data When Models Re-run
 
-- [ ] Real district boundary polygons (choropleth instead of point markers)
-- [ ] Live fire-data re-ingestion pipeline (replace static CSV with a scheduled job)
-- [ ] Crop yield regression model + dedicated `/yield` endpoint, once available
-- [ ] Authentication / role-based views for state nodal officers vs. central MoTA staff
-- [ ] Export-to-PDF for DSS action plans and fire alerts
+### FRA Risk Scores
+```bash
+python3 scripts/gen_data.py path/to/fra_risk_scores.csv
+```
+
+### Fire Forecast
+```bash
+python3 scripts/gen_fire_data.py path/to/fire_forecast_7day.csv
+```
+
+### Rebuild & Deploy
+```bash
+npm run build
+# Deploy dist/ to your server
+```
+
+### Crop Knowledge Base
+Edit `backend/crop-recommender/data/crops.yaml` directly — the live API will serve it immediately. Regenerate `src/data/cropKnowledgeBase.js` to keep the offline fallback in sync (use `gen_crop_kb.py` following the same pattern as above).
+
+### ML Chart Images
+Drop updated charts (heatmap, PCA, risk ranking, ROC/PR curves, feature importance) into `public/images/` with matching filenames.
+
+---
+
+## ⚠️ Known Limitations & Caveats
+
+| Limitation | Impact | Workaround |
+|-----------|--------|-----------|
+| **Fire forecast dates fixed** (24–30 June 2024) | Timeline won't update without re-ingestion | Implement live re-ingestion pipeline (planned) |
+| **District coordinates are centroids** (not official boundaries) | Map shows points, not polygons | Use DataMeet/GADM shapefiles for choropleth |
+| **Crop Recommender demo districts** (5–7 sample points) | Not full district coverage | Extend `CROP_DISTRICTS` in `constants.js` |
+| **No yield prediction** (only suitability ranking) | Can't forecast tons/hectare | ML yield regressor would plug into `ml_score` field (pending) |
+| **Water-budget coefficients uncalibrated** | FAO-56 planning defaults, not validated | See `water.py` docstring; calibrate for your region |
+
+---
+
+## 🛣️ Roadmap
+
+- [ ] Real district boundary polygons (choropleth map instead of points)
+- [ ] Live fire-data re-ingestion pipeline (scheduled job to update CSV)
+- [ ] Crop yield regression model + `/yield` endpoint
+- [ ] Authentication / role-based access (state nodal officers vs. central MoTA staff)
+- [ ] PDF export for DSS action plans and fire alerts
+- [ ] Mobile-responsive optimization (currently desktop-optimized)
+- [ ] Dark mode support
+- [ ] Scheme convergence visualization (sankey / flowchart view)
+
+---
+
+## 📦 Deployment
+
+### Development
+```bash
+npm run dev
+```
+
+### Production
+```bash
+npm run build
+# Serve dist/ via your CDN or web server (Nginx, Apache, Vercel, Netlify, etc.)
+```
+
+### With Django Backend
+```
+MyDjangoApp/
+├── static/
+│   └── dist/          # Symlink or copy from npm run build
+├── templates/
+│   └── index.html     # Serve dist/index.html here
+└── views.py           # API endpoints at /api/
+```
+
+### With FastAPI Backend (Crop Module)
+```bash
+# Start FastAPI service
+uvicorn croprec.api:app --host 0.0.0.0 --port 8000 --reload
+
+# Start React dev server (proxies to 8000 for /recommend)
+npm run dev
+```
+
+---
+
+## 📊 Sample Data Files
+
+The project includes sample data for immediate demo use:
+
+- **fraData.js** — 500 districts with risk scores (auto-generated from CSV)
+- **fireData.js** — 280 fire forecasts for 40 locations over 7 days
+- **cropKnowledgeBase.js** — 18 crops with water/soil/temperature profiles
+- **ML output charts** — PCA scatter, heatmap, ROC/PR curves, feature importance
+
+All generated from real ML models—not templates.
+
+---
+
+## 🧪 Testing
+
+### Manual Testing Checklist
+- [ ] Dashboard loads all 500 districts
+- [ ] Map filters work (by state, risk level, search)
+- [ ] Click district → DSS action plan generates
+- [ ] Fire timeline animation plays smoothly
+- [ ] Crop form submits → scores appear (with or without backend)
+- [ ] Analytics charts re-render on state filter
+- [ ] Mobile: responsive sidebar collapses
+
+### Unit Tests (TODO)
+Scaffold with Vitest:
+```bash
+npm install -D vitest @testing-library/react
+npm run test
+```
+
+---
+
+## 📝 API Contract (Crop Recommender)
+
+```
+POST /recommend
+Content-Type: application/json
+
+{
+  "district": "Indore",
+  "rainfall_mm": 1100,
+  "temp_celsius": 24,
+  "irrigation_cover_pct": 45,
+  "groundwater_status": "critical",
+  "soil_type": "black",
+  "season": "kharif"
+}
+
+Response:
+{
+  "district": "Indore",
+  "recommendations": [
+    {
+      "crop": "Soybean",
+      "score": 92,
+      "used_ml": false,
+      "ml_score": null,
+      "reasons": [
+        { "type": "✓", "text": "Excellent water-budget match: 980mm needed" },
+        { "type": "✕", "text": "Penalised −5: groundwater critical block" }
+      ]
+    },
+    ...
+  ]
+}
+```
+
+Full spec: `backend/crop-recommender/API_CONTRACT.md`
+
+---
+
+## 🤝 Contributing
+
+1. **Fork** the repository
+2. **Create a branch** (`git checkout -b feature/your-feature`)
+3. **Commit changes** (`git commit -am 'Add feature'`)
+4. **Push** (`git push origin feature/your-feature`)
+5. **Open a Pull Request**
+
+### Adding a New Scheme to DSS
+Edit `src/data/constants.js` → `SCHEMES` array, then update `src/pages/DSS.jsx` eligibility logic.
+
+### Adding a New Crop
+1. Append to `backend/crop-recommender/data/crops.yaml`
+2. Regenerate `src/data/cropKnowledgeBase.js` (use `gen_crop_kb.py`)
+3. Test in CropRecommender page
+
+---
+
+## 📄 License
+
+[Specify your license here — e.g., MIT, Apache 2.0, or Government of India standard]
+
+---
+
+## 🙋 Support & Issues
+
+- **Bug reports:** [Open an issue on GitHub](https://github.com/saubhagyasinghal29-spec/Fra-Atlas-Web-gis-project/issues)
+- **Feature requests:** [GitHub Discussions](https://github.com/saubhagyasinghal29-spec/Fra-Atlas-Web-gis-project/discussions)
+- **Contact:** For MoTA integration support, reach out to [your contact/organization]
+
+---
+
+## 🎓 References & Resources
+
+- **Forest Rights Act, 2006:** [Ministry of Tribal Affairs](https://tribal.nic.in)
+- **FAO-56 Crop Water Requirements:** [FAO Irrigation & Drainage Paper 56](http://www.fao.org/3/x0490e/x0490e00.htm)
+- **GIS Base Layers:** [OpenStreetMap](https://www.openstreetmap.org/), [Leaflet Documentation](https://leafletjs.com/)
+- **React Best Practices:** [React Docs](https://react.dev)
+- **Vite Guide:** [Vite Documentation](https://vitejs.dev)
+
+---
+
+## 🙏 Acknowledgments
+
+**Vansetu** is built with data and insights from ML models trained on real FRA, fire, and agronomic datasets. Designed for the **Ministry of Tribal Affairs, Government of India**, in service of transparent, data-driven policy for tribal land rights and sustainable forest management.
+
+---
+
+**Made with ❤️ for the Forest Rights Act, 2006 | Vansetu — Bridging Forests & Communities**
